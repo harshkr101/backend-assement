@@ -71,6 +71,7 @@ export const checkoutCart =
       discount,
       totalPrice: totalPrice - discount,
       items: cart.items,
+      timestamp: Date.now(),
     };
     ordersCache.set(order.id, order); // set order in cache
     cartsCache.delete(cartId); //deletes cart once checkout is completed
