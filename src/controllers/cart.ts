@@ -55,7 +55,13 @@ export const checkoutCart =
         res.status(400).json({ message: "Invalid discount code." });
         return;
       }
-      discountPercentage = coupon.discountPercentage; // get discount percentage from coupon
+      // check if the order is the 3rd order
+      const orders = Array.from(ordersCache.values());
+      if (orders.length % 3 !== 0) {
+        discountPercentage = 0;
+      } else {
+        discountPercentage = coupon.discountPercentage; // get discount percentage from coupon
+      }
     }
 
     // calculate total price of the cart

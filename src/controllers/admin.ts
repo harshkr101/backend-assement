@@ -4,7 +4,16 @@ import { Coupon } from "../utils/interfaces/coupon";
 import { uuid } from "uuidv4";
 
 export const generateCoupon =
-  (couponsCache: any) => (req: Request, res: Response) => {
+  (couponsCache: any, ordersCache: any) => (req: Request, res: Response) => {
+    // get total number of orders
+    const orders = Array.from(ordersCache.values());
+
+    // only generate discount for every 3rd order
+    if (orders.length % 3 !== 0) {
+      return res.status(400).json({
+        message: `Coupon can only be generated for every 3rd order.`,
+      });
+    }
     const discountPercentage = req.body.discount;
     const coupon: Coupon = {
       code: uuid(), // create unique coupon code
