@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { Item } from "../utils/interfaces/item";
 import { Cart } from "../utils/interfaces/cart";
-import { uuid } from "uuidv4";
+import { v4 as uuidv4 } from "uuid";
 
 // create a new cart and return its Id
 export const createCart =
   (cartsCache: any) => (req: Request, res: Response, next: NextFunction) => {
-    const cartId = uuid(); /// create a cart Id
+    const cartId = uuidv4(); /// create a cart Id
     cartsCache.set(cartId, { items: [] }); // creates a new cart
     res.status(201).json({ cartId });
   };
@@ -72,7 +72,7 @@ export const checkoutCart =
     const discount = (totalPrice * discountPercentage) / 100; // calculate discount price
     // creates final order for items
     const order = {
-      id: uuid(),
+      id: uuidv4(),
       cartId,
       discount,
       totalPrice: totalPrice - discount,

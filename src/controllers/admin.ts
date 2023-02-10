@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Order } from "../utils/interfaces/order";
 import { Coupon } from "../utils/interfaces/coupon";
-import { uuid } from "uuidv4";
+import { v4 as uuidv4 } from "uuid";
 
 export const generateCoupon =
   (couponsCache: any, ordersCache: any) => (req: Request, res: Response) => {
@@ -16,7 +16,7 @@ export const generateCoupon =
     }
     const discountPercentage = req.body.discount;
     const coupon: Coupon = {
-      code: uuid(), // create unique coupon code
+      code: uuidv4(), // create unique coupon code
       discountPercentage: discountPercentage, //  discount percentage
     };
     couponsCache.set(coupon.code, coupon); // add coupon to cache
