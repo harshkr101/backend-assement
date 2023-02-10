@@ -14,9 +14,13 @@ export const createCart =
 // add Items to a cart with specific Id
 export const addItemToCart =
   (cartsCache: any) => (req: Request, res: Response, next: NextFunction) => {
-    const { cartId } = req.params; // get cart id
+    const cartId = req.params.id; // get cart id
     const { id, name, price, quantity } = req.body as Item; // get item details
-    const cart = (cartsCache.get(cartId) as Cart) || { items: [] }; //get cart
+    const cart = cartsCache.get(cartId) as Cart; //get cart
+    if (!cart) {
+      res.status(404).json({ message: "Cart not found." });
+      return;
+    }
     cart.items.push({ id, name, price, quantity }); // add items to cart
     cartsCache.set(cartId, cart); // update cart
     res.status(201).json({ message: "Item added to cart successfully." });
@@ -25,8 +29,7 @@ export const addItemToCart =
 // retrieves item in a cart using its Id
 export const getCart =
   (cartsCache: any) => (req: Request, res: Response, next: NextFunction) => {
-    const { cartId } = req.params;
-
+    const cartId = req.params.id;
     const cart = cartsCache.get(cartId) as Cart; // get cart from cache
     if (!cart) {
       res.status(404).json({ message: "Cart not found." });
@@ -39,9 +42,8 @@ export const getCart =
 export const checkoutCart =
   (cartsCache: any, couponsCache: any, ordersCache: any) =>
   (req: Request, res: Response, next: NextFunction) => {
-    const { cartId } = req.params;
-    const { discountCode } = req.body;
-
+    const cartId = req.params.id;
+    const discountCode = req.body.discountCode;
     const cart = cartsCache.get(cartId) as Cart; //get cart from cache
     if (!cart) {
       res.status(404).json({ message: "Cart not found." });
@@ -56,8 +58,8 @@ export const checkoutCart =
         return;
       }
       // check if the order is the 3rd order
-      const orders = Array.from(ordersCache.values());
-      if (orders.length % 3 !== 0) {
+      const orders = ordersCache.keys();
+      if ((orders.length + 1) % 3 !== 0) {
         discountPercentage = 0;
       } else {
         discountPercentage = coupon.discountPercentage; // get discount percentage from coupon
@@ -80,7 +82,7 @@ export const checkoutCart =
       timestamp: Date.now(),
     };
     ordersCache.set(order.id, order); // set order in cache
-    cartsCache.delete(cartId); //deletes cart once checkout is completed
+    cartsCache.del(cartId); //deletes cart once checkout is completed
 
     res.json({ message: "Order placed successfully.", order });
   };
