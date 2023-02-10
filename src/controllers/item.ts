@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export const createItem =
   (itemCache: any) => async (req: Request, res: Response) => {
-    const item = req.body.item;
+    const item = req.body;
     // set item in cache
     const itemId = uuidv4();
     itemCache.set(itemId, { id: itemId, ...item });
@@ -52,10 +52,17 @@ export const deleteItem =
 
 export const readAllItems =
   (itemCache: any) => async (req: Request, res: Response) => {
-    const items = itemCache.keys(); // read all items in cache
-    if (!items) {
+    const itemKeys = itemCache.keys(); // read all items in cache
+    if (!itemKeys) {
       res.status(404).send("Item cache is empty");
       return;
     }
+
+    let items = [];
+    // iterate over item keys to retrieve each item
+    itemKeys.forEach((key: string) => {
+      const item: Item = itemCache.get(key);
+      items.push(item);
+    });
     res.status(200).json({ items: items });
   };
